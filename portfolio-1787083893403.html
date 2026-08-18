@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Moje Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/Observer.min.js"></script>
+<style>
+:root{--accent:#da9216;--acc-rgb:218,146,22;--font:'Montserrat',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#0a0a0a;font-family:var(--font);overflow:hidden}
+/* NAV */
+
+/* NAV */
+:root{--nav-h:60px;--nav-link-color:rgba(255,255,255,0.65);--nav-link-hover:rgba(255,255,255,1)}
+.site-nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,40px);height:var(--nav-h);background:rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:background .4s,border-color .4s,transform .35s}
+.site-nav.scrolled{background:rgba(255,255,255,0.04);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom-color:rgba(255,255,255,0.18)}
+.site-nav.nav-hidden{transform:translateY(-110%)}
+.nav-logo{font-size:1rem;font-weight:700;color:rgba(255,255,255,1);text-decoration:none;letter-spacing:1.5px;text-transform:uppercase;cursor:default}
+.nav-links{display:flex;gap:clamp(14px,3vw,32px);align-items:center}
+.nav-link{color:var(--nav-link-color);text-decoration:none;font-size:0.75rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;transition:color .2s;cursor:pointer;background:none;border:none;font-family:inherit}
+.nav-link:hover{color:var(--nav-link-hover)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;background:none;border:none}
+.hamburger span{display:block;width:22px;height:2px;background:rgba(255,255,255,1);border-radius:1px;transition:all .3s}
+.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mobile-menu{position:fixed;inset:0;background:rgba(10,10,10,0.98);backdrop-filter:blur(14px);z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:0;transform:translateY(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1)}
+.mobile-menu.open{transform:translateY(0)}
+.mm-close-btn{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(255,255,255,.7);font-size:22px;cursor:pointer;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:background .2s}
+.mm-close-btn:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,1)}
+.mm-close-btn{position:fixed;top:24px;right:24px;font-size:28px;width:48px;height:48px}
+
+.mobile-nav-link{color:rgba(255,255,255,.7);text-decoration:none;font-size:clamp(1.8rem,6vw,3rem);font-weight:900;text-transform:uppercase;letter-spacing:2px;padding:12px 0;display:block;cursor:pointer;transition:color .2s,transform .2s;text-align:center}
+.mobile-nav-link:hover{color:rgba(255,255,255,1)}
+.mm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:599;display:none;backdrop-filter:none}
+.mm-overlay.open{display:block}
+@media(max-width:768px){.nav-links{display:none!important}.hamburger{display:flex!important}.site-nav{padding:0 18px}.right-nav{right:8px}}
+/* LAYOUT */
+.main-container{width:100%;will-change:transform;position:absolute;top:0;left:0}
+.page-block{width:100vw;height:100vh;position:relative;z-index:10}
+.site-footer-wrap{width:100vw;position:relative;z-index:10;min-height:100vh;display:flex;flex-direction:column;justify-content:center}
+/* SLIDER */
+.portfolio-header{overflow:visible;z-index:20}
+.slider-wrapper{display:flex;width:700%;height:100%;will-change:transform;overflow:hidden}
+.slide{position:relative;width:100vw;height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.slide-bg{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;filter:brightness(var(--slide-brightness,1)) contrast(1.05);transform:scale(1.05);transition:transform 1.5s cubic-bezier(.2,1,.2,1)}
+.slide.active .slide-bg{transform:scale(1)}
+.slide-overlay{position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none}
+.slide-content{position:relative;z-index:10;color:#fff;padding:0 clamp(20px,6vw,80px);max-width:820px;display:flex;flex-direction:column}
+.slide-content.align-left{align-items:flex-start;text-align:left}
+.slide-content.align-center{align-items:center;text-align:center}
+.slide-content.align-right{align-items:flex-end;text-align:right}
+.category-num{font-size:clamp(.7rem,1.4vw,1rem);font-weight:300;letter-spacing:6px;text-transform:uppercase;color:#777;margin-bottom:14px;display:block}
+.category-title{font-size:clamp(2rem,8vw,5.5rem);font-weight:900;text-transform:uppercase;letter-spacing:-1px;line-height:1.05;margin-bottom:20px}
+.category-desc{font-size:clamp(.85rem,1.5vw,1rem);font-weight:300;letter-spacing:.5px;color:#ccc;max-width:500px;margin-bottom:30px}
+.category-btn{display:inline-block;padding:12px 28px;border:1px solid rgba(var(--acc-rgb),.55);border-radius:28px;color:#fff;text-decoration:none;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:rgba(var(--acc-rgb),.08);backdrop-filter:blur(5px);transition:background .3s,border-color .3s,transform .2s}
+.category-btn:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
+/* DOTS + CHEVRON */
+.slider-nav{position:absolute;bottom:clamp(24px,5vh,52px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:14px;z-index:100}
+.nav-dots{display:flex;gap:clamp(8px,2vw,14px)}
+.dot{width:clamp(6px,1.1vw,9px);height:clamp(6px,1.1vw,9px);border-radius:50%;background:rgba(255,255,255,.22);transition:background .3s,transform .3s;cursor:pointer;border:none}
+.dot.active{background:#fff;transform:scale(1.35)}
+/* CHEVRON DOWN — css.gg style, powiększony */
+.chevron-to-section{cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.55;transition:opacity .25s,transform .25s;background:none;border:none;padding:4px;animation:chPulse 2.2s ease-in-out infinite}
+.chevron-to-section:hover{opacity:1;transform:translateY(3px)}
+@keyframes chPulse{0%,100%{opacity:.45;transform:translateY(0)}50%{opacity:.85;transform:translateY(5px)}}
+.gg-chevron-down{box-sizing:border-box;position:relative;display:block;width:40px;height:40px;border:2.5px solid transparent;border-radius:100px}
+.gg-chevron-down::after{content:"";display:block;box-sizing:border-box;position:absolute;width:18px;height:18px;border-bottom:2.5px solid #fff;border-right:2.5px solid #fff;transform:rotate(45deg);left:9px;top:5px}
+/* RIGHT NAV WIDGET */
+.right-nav{position:fixed;right:clamp(12px,2.5vw,28px);top:50%;transform:translateY(-50%);z-index:400;display:flex;flex-direction:column;gap:8px;opacity:0;pointer-events:none;transition:opacity .4s}
+.sec-dots-nav{position:fixed;left:clamp(12px,2.5vw,28px);top:50%;transform:translateY(-50%);z-index:400;display:flex;flex-direction:column;gap:10px;opacity:0;pointer-events:none;transition:opacity .4s}
+.sec-dots-nav.visible{opacity:var(--nav-op,0.8);pointer-events:auto}
+.sec-dot{width:10px;height:10px;border-radius:50%;background:var(--sd-bg,rgba(255,255,255,0.9));border:none;box-shadow:0 1px 4px rgba(0,0,0,.5);cursor:pointer;transition:transform .2s,opacity .2s;opacity:0.5}
+.sec-dot.active{transform:scale(1.5);opacity:1;background:var(--sd-bg,#fff)}
+.sec-dot:hover{opacity:0.9}
+.right-nav.visible{opacity:var(--nav-op,0.8);pointer-events:auto}
+.rnav-btn{width:40px;height:40px;border-radius:50%;background:var(--rnav-bg,rgba(0,0,0,0.55));border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(8px);box-shadow:0 2px 12px rgba(0,0,0,.4);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:background .2s,transform .2s;position:relative}
+.rnav-btn:hover{background:rgba(255,255,255,.2);transform:scale(1.1)}
+.rnav-btn:disabled{opacity:.25;cursor:default;pointer-events:none}
+.rnav-btn .chev{box-sizing:border-box;display:block;width:10px;height:10px;border-top:2px solid #fff;border-right:2px solid #fff;transform:rotate(-45deg);margin-top:3px}
+.rnav-btn.double-chev{gap:0}
+.rnav-btn.double-chev .chev:last-child{margin-top:-5px}
+.rnav-tooltip{position:absolute;right:48px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.75);color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;font-family:system-ui}
+.rnav-btn:hover .rnav-tooltip{opacity:1}
+.slide-counter{position:absolute;bottom:clamp(18px,4vh,42px);right:clamp(14px,3vw,40px);color:rgba(255,255,255,.3);font-size:.65rem;letter-spacing:2px;z-index:100}
+/* SECTIONS */
+.full-page-section{display:flex;flex-direction:column;justify-content:center;padding:0 clamp(5%,10%,120px);position:relative;overflow:hidden;}
+.full-page-section.align-left{align-items:flex-start;text-align:left}
+.full-page-section.align-center{align-items:center;text-align:center}
+.full-page-section.align-right{align-items:flex-end;text-align:right}
+.full-page-section h2{font-size:clamp(1.7rem,5vw,3.5rem);font-weight:900;margin-bottom:18px;text-transform:uppercase;letter-spacing:-.5px;color:#fff;width:100%;text-align:inherit}
+.full-page-section p{font-size:clamp(.88rem,2vw,1.12rem);max-width:580px;opacity:.8;line-height:1.7;margin-bottom:26px;color:#fff;margin-left:auto;margin-right:auto}
+.section-btn{display:inline-block;padding:11px 26px;border:1px solid rgba(var(--acc-rgb),.5);border-radius:26px;color:#fff;text-decoration:none;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:rgba(var(--acc-rgb),.08);transition:background .3s,transform .2s}
+.section-btn:hover{background:var(--accent);transform:translateY(-2px)}
+#section-end{display:flex}
+.sec-content{position:relative;z-index:1;width:100%;}
+.home-reset-btn{display:inline-block;padding:13px 30px;border:1px solid rgba(var(--acc-rgb),.5);border-radius:28px;color:#fff;font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;background:rgba(var(--acc-rgb),.08);cursor:pointer;transition:background .3s,transform .2s}
+.home-reset-btn:hover{background:var(--accent);transform:translateY(-2px)}
+/* FOOTER — FIX: height:auto, nie page-block */
+.site-footer{display:flex;flex-direction:row;justify-content:center;align-items:center;gap:clamp(20px,6vw,60px);flex-wrap:wrap;width:100%;box-sizing:border-box}
+.footer-block{text-align:center;color:#fff}
+.footer-block h4{font-size:.78rem;letter-spacing:2px;text-transform:uppercase;opacity:.45;margin-bottom:7px}
+.footer-block p{font-size:.82rem;opacity:.45;margin-bottom:10px;line-height:1.5;max-width:220px}
+.footer-btn{display:inline-block;padding:7px 18px;border:1px solid rgba(255,255,255,.18);border-radius:18px;color:rgba(255,255,255,.65);text-decoration:none;font-size:.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;transition:all .2s}
+.footer-btn:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:768px){.nav-links{display:none!important}.hamburger{display:flex!important}.site-nav{padding:0 18px}.right-nav{right:8px}}
+</style>
+</head>
+<body>
+<nav class="site-nav" id="site-nav">
+  <span class="nav-logo">Moje Portfolio</span>
+  <div class="nav-links"><a href="#start" class="nav-link" onclick="navTo('slide',0);return false;">Start</a><a href="#about" class="nav-link" onclick="navTo('slide',0);return false;">O mnie</a><a href="#contact" class="nav-link" onclick="navTo('section',2);return false;">Kontakt</a></div>
+  <button class="hamburger" id="hbg"><span></span><span></span><span></span></button>
+</nav>
+<div class="mm-overlay" id="mmo"></div>
+<div class="mobile-menu" id="mm"><button class="mm-close-btn" aria-label="Zamknij menu">✕</button><a href="#start" class="mobile-nav-link" onclick="closeMM();navTo('slide',0);return false;">Start</a><a href="#about" class="mobile-nav-link" onclick="closeMM();navTo('slide',0);return false;">O mnie</a><a href="#contact" class="mobile-nav-link" onclick="closeMM();navTo('section',2);return false;">Kontakt</a></div>
+
+<!-- RIGHT NAV WIDGET -->
+<div id="sec-dots-nav" class="sec-dots-nav" style="--sd-bg:#919191;--nav-op:0.45;right:calc(clamp(12px,2.5vw,28px) + 15px);left:auto;top:calc(50% + 56px);bottom:auto;transform:none;display:none;" data-show-on-slides="true">
+</div>
+<div id="right-nav" class="right-nav" style="--rnav-bg:#6e6e6e;--nav-op:0.45;">
+  <button class="rnav-btn" id="rnav-sec" onclick="navTo('section',0)" title="Pierwsza sekcja">
+    <span class="chev"></span>
+    <span class="rnav-tooltip">Pierwsza sekcja</span>
+  </button>
+  <button class="rnav-btn double-chev" id="rnav-home" onclick="navTo('home',0)" title="Powrót na start">
+    <span class="chev"></span>
+    <span class="chev"></span>
+    <span class="rnav-tooltip">Powrót na start</span>
+  </button>
+</div>
+
+<div class="main-container" id="mc">
+  <header class="portfolio-header page-block">
+    <div class="slider-wrapper" id="sw"><div class="slide active" id="slide-0" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background:linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="color:#ffffff;">
+        <span class="category-num">01 / 07</span>
+        <h2 class="category-title">Bogdan</h2>
+        <p class="category-desc">Niby niepozorny inteligent z ciętym żartem w zanadrzu a wewnątrz ogromne bogactwo pomysłów i dobry kompan.</p>
+        <a href="#" class="category-btn" style="background:#ecae3c;color:#000000">Zobacz więcej</a>
+      </div></div><div class="slide" id="slide-1" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.pexels.com/photos/27048115/pexels-photo-27048115.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">02 / 07</span>
+        <h2 class="category-title">Krajobrazy</h2>
+        <p class="category-desc">Cisza uchwycona w kadrze. Natura w najczystszej postaci.</p>
+        <a href="#" class="category-btn" >Zobacz Projekty</a>
+      </div></div><div class="slide" id="slide-2" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.pexels.com/photos/33410957/pexels-photo-33410957.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">03 / 07</span>
+        <h2 class="category-title">Architektura</h2>
+        <p class="category-desc">Geometryczny ład, beton, szkło i nowoczesna myśl techniczna.</p>
+        <a href="#" class="category-btn" >Eksploruj Budynki</a>
+      </div></div><div class="slide" id="slide-3" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.pexels.com/photos/10856835/pexels-photo-10856835.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">04 / 07</span>
+        <h2 class="category-title">Portrety</h2>
+        <p class="category-desc">Emocje i ludzkie historie zapisane w jednym spojrzeniu.</p>
+        <a href="#" class="category-btn" >Oglądaj Twarze</a>
+      </div></div><div class="slide" id="slide-4" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.pexels.com/photos/19130050/pexels-photo-19130050.png?auto=compress&amp;cs=tinysrgb&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">05 / 07</span>
+        <h2 class="category-title">Komercja</h2>
+        <p class="category-desc">Produkt zdefiniowany na nowo. Estetyka, która sprzedaje.</p>
+        <a href="#" class="category-btn" >Oferta Biznesowa</a>
+      </div></div><div class="slide" id="slide-5" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">06 / 07</span>
+        <h2 class="category-title">Wydarzenia</h2>
+        <p class="category-desc">Ekspresja, styl i awangardowe podejście do fotografii eventowej.</p>
+        <a href="#" class="category-btn" >Kolekcje</a>
+      </div></div><div class="slide" id="slide-6" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&amp;w=1920')"></div>
+      <div class="slide-overlay" style="background:rgba(0,0,0,0.54);"></div>
+      <div class="slide-content align-center" style="">
+        <span class="category-num">07 / 07</span>
+        <h2 class="category-title">Dzika Natura</h2>
+        <p class="category-desc">Nieokiełznany świat flory i fauny w obiektywie makro.</p>
+        <a href="#" class="category-btn" >Odkryj Dzicz</a>
+      </div></div></div>
+    <div class="slider-nav">
+      <div class="nav-dots" id="nd"><button class="dot active" data-i="0"></button><button class="dot" data-i="1"></button><button class="dot" data-i="2"></button><button class="dot" data-i="3"></button><button class="dot" data-i="4"></button><button class="dot" data-i="5"></button><button class="dot" data-i="6"></button></div>
+      <button class="chevron-to-section" onclick="navTo('section',0)" title="Przejdź do pierwszej sekcji">
+        <span class="gg-chevron-down"></span>
+      </button>
+    </div>
+    <div class="slide-counter" id="sc">1 / 7</div>
+  </header>
+  <section class="full-page-section page-block align-center" id="section-0" style="background:linear-gradient(90deg,rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);;" data-anim="blurIn" data-speed="0.8" data-delay="0.1" data-easing="power2" data-trigger="onEnter">
+      
+      <div class="sec-content"><h2>O Mnie</h2><p>Jestem niezależnym fotografem z ponad dwudziestoletnim doświadczeniem. Łączę pasję do obrazu z techniczną precyzją.</p></div>
+    </section><section class="full-page-section page-block align-center" id="section-1" style="background:linear-gradient(90deg, #a47451 0.000%, #9c9881 16.667%, #73a09d 33.333%, #3b899a 50.000%, #095b79 66.667%, #002847 83.333%, #000116 100.000%);;" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      
+      <div class="sec-content"><h2>Jak Działam</h2><p>Od konceptu, przez sesję, aż do zaawansowanej postprodukcji. Każde zlecenie traktuję indywidualnie.</p></div>
+    </section><section class="full-page-section page-block align-center" id="section-2" style="background-image:url('https://images.pexels.com/photos/36033428/pexels-photo-36033428.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1920');background-size:cover;background-position:center;" data-anim="fadeIn" data-speed="0.8" data-delay="0" data-easing="power2" data-trigger="onEnter">
+      <div class="sec-bg-overlay" style="position:absolute;inset:0;background:rgba(0,0,0,0.45);z-index:0"></div>
+      <div class="sec-content"><h2>Nagrody i Publikacje</h2><p>Prace wyróżniane na międzynarodowych festiwalach i publikowane w topowych magazynach branżowych.</p></div>
+    </section>
+  <section class="full-page-section page-block align-center" id="section-end" style="background:linear-gradient(135deg,#1f1c18,#2c1e18)">
+    <div class="sec-content">
+    <h2>Koniec Prezentacji</h2>
+    <p>Chcesz zobaczyć kategorie portfolio jeszcze raz?</p>
+    <button class="home-reset-btn" id="bhh" style="">Wróć do początku</button>
+    
+    </div>
+  </section>
+  <div class="site-footer-wrap" style="background:#070707;padding-top:clamp(32px,6vw,64px)"><footer class="site-footer"><div class="footer-row" style="display:flex;flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:clamp(20px,6vw,60px);padding:clamp(32px,6vw,64px) clamp(16px,8vw,80px);width:100%"><div class="footer-block" style="color:#ffffff"><h4 style="color:#ffffff">Kontakt</h4><p style="color:#ffffff">Skontaktuj się w sprawie współpracy.</p> <a href="mailto:foto@example.com" class="footer-btn">Napisz</a></div><div class="footer-block" style="color:#ffffff"><h4 style="color:#ffffff">Social Media</h4><p style="color:#ffffff">Obserwuj najnowsze projekty.</p> <a href="https://instagram.com" class="footer-btn">Instagram</a></div></div></footer></div>
+</div>
+
+<script>
+
+// NAV BEHAVIOUR
+(function(){
+  var nav=document.querySelector('.site-nav');
+  var autoHide=true;
+  var lastGroup=0; // GSAP group index — 0=slajdy, 1..=sekcje
+  // scroll (dla stron bez GSAP)
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY||0;
+    if(y>40)nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+    if(autoHide){if(y>80)nav.classList.add('nav-hidden');else nav.classList.remove('nav-hidden');}
+  },{passive:true});
+  // Hook GSAP navTo dla auto-hide i scrolled
+  var _nh=window.navTo;
+  window.navTo=function(type,idx){
+    var g=(type==='home')?0:1;
+    if(autoHide&&g>lastGroup)nav.classList.add('nav-hidden');
+    else nav.classList.remove('nav-hidden');
+    lastGroup=g;
+    if(g>0)nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+    if(typeof _nh==='function')_nh.apply(this,arguments);
+  };
+  // Hamburger
+  var hb=document.querySelector('.hamburger');
+  var mm=document.querySelector('.mobile-menu');
+  var ov=document.querySelector('.mm-overlay');
+  var cl=document.querySelector('.mm-close-btn');
+  function openMM(){mm.classList.add('open');ov.classList.add('open');hb.classList.add('open');document.body.style.overflow='hidden';}
+  function closeMM(){mm.classList.remove('open');ov.classList.remove('open');hb.classList.remove('open');document.body.style.overflow='';}
+  if(hb)hb.addEventListener('click',function(){mm.classList.contains('open')?closeMM():openMM();});
+  if(ov)ov.addEventListener('click',closeMM);
+  if(cl)cl.addEventListener('click',closeMM);
+  document.querySelectorAll('.mobile-nav-link').forEach(function(a){a.addEventListener('click',closeMM);});
+  // Expose globally for onclick attributes on mobile links
+  window.closeMM=closeMM;
+  window.openMM=openMM;
+})();
+gsap.registerPlugin(Observer);
+const mc=document.getElementById('mc'),sw=document.getElementById('sw');
+const sls=document.querySelectorAll('.slide'),dots=document.querySelectorAll('.dot');
+const nav=document.getElementById('site-nav'),ctr=document.getElementById('sc');
+const allSecs=document.querySelectorAll('.full-page-section');
+const footerWrap=document.querySelector('.site-footer-wrap');
+const totalG=1+allSecs.length+(footerWrap?1:0);
+/* Ustaw wysokość main-container dynamicznie */
+function setMcHeight(){
+  const secCount=allSecs.length+(footerWrap?1:0);
+  const footerH=footerWrap?footerWrap.offsetHeight:0;
+  mc.style.height=(window.innerHeight*(1+allSecs.length)+footerH)+'px';
+}
+setMcHeight();
+window.addEventListener('resize',setMcHeight);
+const rnavEl=document.getElementById('right-nav');
+const rnavSec=document.getElementById('rnav-sec');
+const rnavHome=document.getElementById('rnav-home');
+let cs=0,cg=0,anim=false,wt=null;
+
+dots.forEach((d,i)=>d.addEventListener('click',()=>{if(cg===0)chS(i,i>cs?'n':'p')}));
+
+function chS(idx,dir){
+  if(anim||idx<0||idx>=sls.length)return;anim=true;
+  gsap.to(sls[cs].querySelector('.slide-content'),{opacity:0,x:dir==='n'?-38:38,duration:.25});
+  sls[cs].classList.remove('active');sls[idx].classList.add('active');
+  const n=sls.length;
+  gsap.to(sw,{x:`-${idx*(100/n)}%`,duration:.72,ease:'power2.inOut',onComplete(){cs=idx;anim=false;updateRnav()}});
+  const sl=sls[idx];
+  const animType=sl.dataset.anim;
+  if(animType&&animType!=='none'&&animType!=='fadeIn'){
+    // custom anim — override domyślnego fromTo
+    const cont=sl.querySelector('.slide-content');
+    if(cont)setTimeout(()=>applyAnim(cont,{type:animType,speed:sl.dataset.speed,delay:sl.dataset.delay,easing:sl.dataset.easing}),180);
+  }else{
+    gsap.fromTo(sl.querySelector('.slide-content'),{opacity:0,x:dir==='n'?38:-38},{opacity:1,x:0,duration:.42,delay:.18});
+  }
+  dots.forEach((d,i)=>d.classList.toggle('active',i===idx));
+  if(ctr)ctr.textContent=(idx+1)+' / '+n;
+}
+
+function chG(idx){
+  if(anim||idx<0||idx>=totalG)return;anim=true;
+  nav.classList.toggle('scrolled',idx>0);
+  // Pre-hide: ukryj sec-content przed nawigacją (eliminuje flash przy animacji)
+  const _tsi=idx-1;
+  if(_tsi>=0){
+    const _ts=document.getElementById('section-'+_tsi);
+    if(_ts&&_ts.dataset.anim&&_ts.dataset.anim!=='none'){
+      const _sc=_ts.querySelector('.sec-content');
+      if(_sc)gsap.set(_sc,{opacity:0});
+    }
+  }
+    const isFooter=footerWrap&&idx===totalG-1;
+  if(isFooter){
+    const yPx=-(footerWrap.offsetTop);
+    gsap.to(mc,{y:yPx,duration:.82,ease:'power2.inOut',onComplete(){cg=idx;anim=false;updateRnav();if(idx>=1&&idx<totalG-1){setTimeout(()=>animateSection(idx-1),50);updateSecDots(idx-1);}else{updateSecDots(-1);}}});
+  }else{
+    gsap.to(mc,{y:`-${idx*100}vh`,duration:.82,ease:'power2.inOut',onComplete(){cg=idx;anim=false;updateRnav();if(idx>=1&&idx<totalG-1){setTimeout(()=>animateSection(idx-1),50);updateSecDots(idx-1);}else{updateSecDots(-1);}}});
+  }
+}
+
+/* Universal navigation */
+function navTo(type,idx){
+  if(anim)return;
+  if(type==='slide'){chG(0);setTimeout(()=>chS(idx,idx>cs?'n':'p'),cg===0?0:860)}
+  else if(type==='section'){chG(idx+1)}
+  else if(type==='end'){chG(totalG-2)}
+  else if(type==='footer'){chG(totalG-1)}
+  else if(type==='home'){
+    anim=true;nav.classList.remove('scrolled');
+    gsap.to(mc,{y:0,duration:1,ease:'power3.inOut',onComplete(){
+      cg=0;sls.forEach(s=>s.classList.remove('active'));sls[0].classList.add('active');
+      dots.forEach((d,i)=>d.classList.toggle('active',i===0));
+      gsap.set(sw,{x:0});gsap.set(sls[0].querySelector('.slide-content'),{opacity:1,x:0});
+      if(ctr)ctr.textContent='1 / '+sls.length;cs=0;anim=false;updateRnav();
+    }});
+  }
+}
+window.navTo=navTo;
+window.rnavToSec=function(){navTo('section',0);};
+window.rnavToHome=function(){navTo('home',0);};
+window.rnavToEnd=function(){navTo('end',0);};
+
+function updateRnav(){
+  if(!rnavEl)return;
+  if(cg===0){
+    // Na slajdach: żadna ikona nie widoczna
+    rnavEl.classList.remove('visible');
+  }else{
+    // Na sekcjach/stopce: rnav widoczny
+    rnavEl.classList.add('visible');
+    // rnav-sec (do pierwszej sekcji): widoczny gdy cg>1 (jest sekcja wyżej niż bieżąca)
+    if(rnavSec)rnavSec.style.display=cg>1?'flex':'none';
+    // rnav-home (do pierwszego slajdu): zawsze widoczny na sekcjach
+    if(rnavHome)rnavHome.style.display='flex';
+  }
+}
+
+function fwd(){if(anim)return;cg===0&&cs<sls.length-1?chS(cs+1,'n'):chG(cg+1)}
+function bwd(){if(anim)return;cg===0&&cs>0?chS(cs-1,'p'):cg>0&&chG(cg-1)}
+
+window.addEventListener('wheel',e=>{e.preventDefault();clearTimeout(wt);wt=setTimeout(()=>{Math.abs(e.deltaY)<20||(e.deltaY>0?fwd():bwd())},50)},{passive:false});
+Observer.create({target:window,type:'touch,pointer',preventDefault:true,tolerance:18,onUp(s){s.type!=='wheel'&&fwd()},onDown(s){s.type!=='wheel'&&bwd()}});
+window.addEventListener('keydown',e=>{'ArrowDown,ArrowRight,PageDown'.includes(e.key)&&(e.preventDefault(),fwd());'ArrowUp,ArrowLeft,PageUp'.includes(e.key)&&(e.preventDefault(),bwd())});
+
+document.getElementById('bhh').addEventListener('click',()=>navTo('home',0));
+
+
+
+/* ══════════════════════════════════════════
+   ANIM ENGINE — patch_06
+   ══════════════════════════════════════════ */
+function applyAnim(el,opts){
+  if(!el||!window.gsap)return;
+  const type=opts.type||'fadeIn';
+  const dur=parseFloat(opts.speed)||0.8;
+  const delay=parseFloat(opts.delay)||0;
+  const ease=(opts.easing||'power2')+'.out';
+  // gsap.set() ustawia stan startowy synchronicznie (bez flash)
+  // gsap.to() animuje do stanu końcowego
+  // clearProps tylko dla animowanych właściwości (nie resetuje background/color)
+  const toVars={duration:dur,delay:delay,ease:ease};
+
+  switch(type){
+    case 'none': return;
+    case 'fadeIn':
+      gsap.set(el,{opacity:0}); toVars.opacity=1; toVars.clearProps='opacity'; break;
+    case 'blurIn':
+      gsap.set(el,{opacity:0,filter:'blur(20px)'});
+      toVars.opacity=1; toVars.filter='blur(0px)'; toVars.clearProps='opacity,filter'; break;
+    case 'zoomIn':
+      gsap.set(el,{opacity:0,scale:0.01,transformOrigin:'center center'});
+      toVars.opacity=1; toVars.scale=1; toVars.clearProps='opacity,scale,transformOrigin'; break;
+    case 'zoomOut':
+      gsap.set(el,{opacity:0,scale:1.8,transformOrigin:'center center'});
+      toVars.opacity=1; toVars.scale=1; toVars.clearProps='opacity,scale,transformOrigin'; break;
+    case 'slideLeft':
+      gsap.set(el,{opacity:0,x:-80});
+      toVars.opacity=1; toVars.x=0; toVars.clearProps='opacity,x'; break;
+    case 'slideRight':
+      gsap.set(el,{opacity:0,x:80});
+      toVars.opacity=1; toVars.x=0; toVars.clearProps='opacity,x'; break;
+    case 'slideUp':
+      gsap.set(el,{opacity:0,y:80});
+      toVars.opacity=1; toVars.y=0; toVars.clearProps='opacity,y'; break;
+    case 'slideDown':
+      gsap.set(el,{opacity:0,y:-80});
+      toVars.opacity=1; toVars.y=0; toVars.clearProps='opacity,y'; break;
+    case 'shake':
+      gsap.fromTo(el,{x:-18},{x:18,duration:0.06,repeat:7,yoyo:true,ease:'none',delay:delay,onComplete:()=>gsap.set(el,{x:0})});
+      return;
+    case 'vibrate':
+      gsap.fromTo(el,{x:-5},{x:5,duration:0.03,repeat:15,yoyo:true,ease:'none',delay:delay,onComplete:()=>gsap.set(el,{x:0})});
+      return;
+    case 'wobble':
+      gsap.fromTo(el,{rotation:-6},{rotation:6,duration:0.25,repeat:5,yoyo:true,ease:'sine.inOut',delay:delay,onComplete:()=>gsap.set(el,{rotation:0})});
+      return;
+    default:
+      gsap.set(el,{opacity:0}); toVars.opacity=1;
+  }
+  gsap.to(el,toVars);
+}
+
+/* Animuj zawartość slajdu/sekcji po wejściu */
+function animateSlide(idx){
+  const el=document.getElementById('slide-'+idx);
+  if(!el)return;
+  const type=el.dataset.anim;
+  if(!type||type==='none')return;
+  const content=el.querySelector('.slide-content');
+  if(content)applyAnim(content,{
+    type:type,speed:el.dataset.speed,delay:el.dataset.delay,
+    easing:el.dataset.easing,trigger:el.dataset.trigger
+  });
+}
+
+function animateSection(idx){
+  const el=document.getElementById('section-'+idx);
+  if(!el)return;
+  const type=el.dataset.anim;
+  if(!type||type==='none')return;
+  // Animuj .sec-content (wewnętrzny div z tekstem), nie sam element sekcji
+  // Dzięki temu tło/gradient sekcji nie jest resetowane przez GSAP
+  const inner=el.querySelector('.sec-content')||el.querySelector('[style*="z-index:1"]')||el;
+  applyAnim(inner,{
+    type:type,speed:el.dataset.speed,delay:el.dataset.delay,
+    easing:el.dataset.easing,trigger:el.dataset.trigger
+  });
+}
+
+/* previewAnim — przycisk "Podgląd animacji" w edytorze */
+function previewAnim(kind,idx){
+  const cfg=CONFIG;
+  const item=kind==='slide'?cfg.slidesData[idx]:cfg.sectionsData[idx];
+  if(!item||!item.anim)return;
+  // Uruchom preview w iframe podglądu
+  try{
+    const pv=document.getElementById('preview-frame')||document.querySelector('iframe');
+    if(pv&&pv.contentWindow){
+      const fn=kind==='slide'?pv.contentWindow.animateSlide:pv.contentWindow.animateSection;
+      if(fn)fn(idx);
+    }
+  }catch(e){}
+}
+
+/* ── Hover animacje CTA (patch_08) ── */
+(function initBtnHover(){
+  if(!window.gsap)return;
+  document.addEventListener('mouseover',function(e){
+    const btn=e.target.closest('.category-btn,.section-btn');
+    if(btn&&!btn._hovered){btn._hovered=true;gsap.to(btn,{scale:1.06,duration:0.18,ease:'power2.out'});}
+  });
+  document.addEventListener('mouseout',function(e){
+    const btn=e.target.closest('.category-btn,.section-btn');
+    if(btn&&btn._hovered){btn._hovered=false;gsap.to(btn,{scale:1,duration:0.22,ease:'power2.inOut'});}
+  });
+})();
+
+// Inicjalizacja nav dots i config po załadowaniu strony
+(function(){
+  function _initNav(){
+    if(typeof buildSecDots==='function')buildSecDots();
+    if(typeof applyNavConfig==='function')applyNavConfig();
+    // Pokaż rnav i sec-dots od razu po załadowaniu
+    if(typeof updateRnav==='function')updateRnav();
+    if(typeof updateSecDots==='function')updateSecDots(-1);
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',_initNav);
+  }else{
+    setTimeout(_initNav,200);
+  }
+})();
+
+
+
+/* ── Nav Config (rnav + sec-dots) ── */
+function applyNavConfig(){
+  // Kolory/widoczność są już zakodowane jako inline style w HTML (z edytora)
+  // Ta funkcja jest wywoływana tylko w edytorze - w eksporcie jest no-op
+  if(typeof CONFIG==='undefined')return;
+  var nc=CONFIG.navConfig||{};
+  var rn=nc.rnav||{visible:true,color:'#ffffff',opacity:0.7};
+  var sd=nc.secDots||{visible:true,color:'#ffffff',opacity:0.7};
+  var rnav=document.getElementById('right-nav');
+  if(rnav){
+    rnav.style.setProperty('--rnav-bg', rn.color||'rgba(0,0,0,0.55)');
+    rnav.style.setProperty('--nav-op', rn.opacity??0.8);
+    if(rn.visible===false){rnav.style.display='none';}
+    else{rnav.style.display='';}
+  }
+  var sdn=document.getElementById('sec-dots-nav');
+  if(sdn){
+    sdn.style.setProperty('--sd-bg', sd.color||'rgba(255,255,255,0.9)');
+    sdn.style.setProperty('--nav-op', sd.opacity??0.8);
+    if(sd.visible===false){sdn.style.display='none';}
+    else{sdn.style.display='';}
+    // Pozycja: lewa lub prawa (pod rnav)
+    var sdPos=sd.position||'left';
+    if(sdPos==='right'){
+      sdn.style.left='auto';
+      sdn.style.right='calc(clamp(12px,2.5vw,28px) + 15px)';
+      sdn.style.top='calc(50% + 56px)';
+      sdn.style.bottom='auto';
+      sdn.style.transform='none';
+    }else{
+      sdn.style.left='clamp(12px,2.5vw,28px)';
+      sdn.style.right='auto';
+      sdn.style.top='50%';
+      sdn.style.transform='translateY(-50%)';
+      sdn.style.marginTop='';
+    }
+  }
+}
+
+function buildSecDots(){
+  var sdn=document.getElementById('sec-dots-nav');
+  if(!sdn)return;
+  // navConfig nie jest dostępne w eksporcie - widoczność kontrolowana przez CSS/inline
+  var sdVisible=sdn.style.display!=='none';
+  if(!sdVisible)return;
+  var secs=document.querySelectorAll('.full-page-section[id^="section-"]');
+  if(!secs.length){sdn.innerHTML='';return;}
+  sdn.innerHTML=Array.from(secs).map(function(s,i){
+    return '<button class="sec-dot" data-si="'+i+'" title="Sekcja '+(i+1)+'"></button>';
+  }).join('');
+  // Event delegation - zero apostrofów w HTML
+  sdn.onclick=function(e){
+    var btn=e.target.closest('.sec-dot');
+    if(btn){navTo('section',parseInt(btn.dataset.si)||0);}
+  };
+}
+
+function updateSecDots(secIdx){
+  var dots=document.querySelectorAll('.sec-dot');
+  dots.forEach(function(d,i){d.classList.toggle('active',parseInt(d.dataset.si)===secIdx);});
+  var sdn=document.getElementById('sec-dots-nav');
+  if(!sdn||sdn.style.display==='none')return;
+  var showOnSlides=sdn.dataset.showOnSlides==='true';
+  if(cg===0&&!showOnSlides){
+    // Na slajdach - ukryj jeśli nie ma opcji showOnSlides
+    sdn.classList.remove('visible');
+  }else{
+    sdn.classList.add('visible');
+  }
+}
+
+
+</script>
+</body>
+</html>
